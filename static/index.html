@@ -648,6 +648,7 @@ footer {
 
 <script>
 function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function escAttr(s){ return esc(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
 function updateCount(el,id){ document.getElementById(id).textContent = el.value.length; }
 
 document.getElementById("case-id").textContent = "PC-" + Math.floor(100000+Math.random()*900000);
@@ -791,7 +792,7 @@ function renderResults(d){
       <div class="reform-header">
         <div class="reform-ver">v${i+1}</div>
         <div class="reform-label">${esc(v.label)}</div>
-        <button class="reform-copy-btn" onclick="copyP(this,${JSON.stringify(v.prompt)})">Copy</button>
+        <button class="reform-copy-btn" data-copy="${escAttr(v.prompt)}" onclick="copyP(this)">Copy</button>
       </div>
       <div class="reform-strategy">${esc(v.strategy)}</div>
       <div class="reform-prompt-text">${esc(v.prompt)}</div>
@@ -803,11 +804,30 @@ function renderResults(d){
   r.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
-function copyP(btn,text){
-  navigator.clipboard.writeText(text).then(()=>{
+async function copyP(btn){
+  const text=btn.dataset.copy||"";
+  const original=btn.textContent;
+
+  try{
+    if(navigator.clipboard&&window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+    }else{
+      const ta=document.createElement("textarea");
+      ta.value=text;
+      ta.setAttribute("readonly","");
+      ta.style.position="fixed";
+      ta.style.left="-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
     btn.textContent="Copied";
-    setTimeout(()=>btn.textContent="Copy",2000);
-  });
+  }catch(e){
+    btn.textContent="Copy failed";
+  }
+
+  setTimeout(()=>btn.textContent=original,2000);
 }
 
 document.addEventListener("keydown",e=>{
