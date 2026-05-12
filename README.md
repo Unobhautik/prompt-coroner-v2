@@ -142,9 +142,3 @@ START
 | **Total** | **₹0** |
 
 ---
-
-## 📝 Resume bullet point
-
-> "Built a multi-agent LLM pipeline using LangGraph StateGraph with conditional routing,
-> parallel agent fan-out via the Send API, and LangChain RAG retrieval —
-> enabling forensic prompt failure analysis with severity-conditional deep-dive reasoning."
